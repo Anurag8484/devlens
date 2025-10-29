@@ -1,27 +1,12 @@
-'use client'
-import { useSession } from "next-auth/react";
+import Navbar from "./components/Navbar";
 
-export default function Home() {
-  const {data:session,status} = useSession();
-  console.log(session)
-  if(!session){
-    return(
-      <div>No sesison</div>
-    )
-  }
+export default function LandingPage() {
   return (
-    <div>
-      <h1>Welcome, {session.user?.name}</h1>
-      {session.user?.image && (
-        <img
-          src={session.user.image}
-          alt="User avatar"
-          width={50}
-          height={50}
-        />
-      )}
-      <p>Email: {session.user?.email}</p>
-      <button onClick={() => {}}>Sign out</button>
+    <div className="m-1 ">
+      <Navbar/>
+      <div className=" flex justify-center items-center text-2xl">
+        Hey, Welocme to the DevLens
+      </div>
     </div>
   );
 }
