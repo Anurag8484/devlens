@@ -56,7 +56,7 @@ export default  function () {
             <span>Comments</span>
             <span>State</span>
             <span>title</span>
-            <span>body</span>
+            <span>date</span>
             <span>labels</span>
             <span>Link</span>
           </div>
@@ -73,9 +73,9 @@ export default  function () {
                   <span >{issue.id}</span>
                   <span >{issue.comments}</span>
                   <span >{issue.state}</span>
-                  <span className="text-red-300 w-5 text-sm">{issue.title}</span>
-                  <span className="text-sm text-neutral-700  ">{issue.body}</span>
-                  <span className="text-sm text-red-400">{issue.labels.map((l)=>(<span>{l}</span>))}</span>
+                  <span className="text-red-300  text-sm">{issue.title}</span>
+                  <span className="text-sm text-neutral-700  ">{`${new Date(issue.createdAt)}`}</span>
+                  <span className="text-sm text-red-400">{issue.labels.map((l,idx)=>(<span key={idx}>{l}</span>))}</span>
                   <a className="text-blue-400">{issue.url}</a>
                 </div>
               ))
