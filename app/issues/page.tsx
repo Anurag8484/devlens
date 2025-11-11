@@ -5,28 +5,33 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 type Issue = {
-  number: number;
+  id: number;
   title: string;
   url: string;
   body: string;
+  state: string;
+  labels: string[];
+  comments: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-type Repo = {
-  repoId: number;
-  name: string;
-  owner: string;
-  issues: Issue[];
-}
+// type Repo = {
+//   repoId: number;
+//   name: string;
+//   owner: string;
+//   issues: Issue[];
+// }
 
 
 export default  function () {
-  const [repos,setRepos] = useState<Repo[]>([]);
+  const [issues,setIssues] = useState<Issue[]>([]);
   useEffect(()=>{
     const fetchIssues = async()=>{
       try {
         await axios.get("http://localhost:3000/api/issues").then(res=>{
-          setRepos(res.data.data);
-          console.log(res.data.data)
+          setIssues(res.data.data);
+          console.log(res.data.filteredData);
         })
 
       } catch (error) {
@@ -48,30 +53,32 @@ export default  function () {
         <div className="flex flex-col items-center my-10 gap-5">
           <div className="outline-1 w-full rounded-sm p-4 flex justify-around">
             <span>#</span>
-            <span>Issue</span>
-            <span>Repo</span>
-            <span>Description</span>
+            <span>Comments</span>
+            <span>State</span>
+            <span>title</span>
+            <span>body</span>
+            <span>labels</span>
             <span>Link</span>
           </div>
-          {repos.length === 0 ? (
+          {issues.length === 0 ? (
             <div className="flex justify-center items-center py-10 text-muted-foreground">
               Loading issues...
             </div>
           ) : (
-            repos.map((repo) =>
-              repo.issues.map((issue, idx) => (
+              issues.map((issue, idx) => (
                 <div
                   key={idx}
                   className=" w-full  gap-10 bg-neutral-50 rounded-md  p-4 flex justify-around"
                 >
-                  <span>{issue.number}</span>
-                  <span className="text-red-300">{issue.title}</span>
-                  <span className="text-sm text-neutral-500">{issue.body}</span>
-                  <span className="text-4xl text-red-400">{repo.name}</span>
+                  <span >{issue.id}</span>
+                  <span >{issue.comments}</span>
+                  <span >{issue.state}</span>
+                  <span className="text-red-300 w-5 text-sm">{issue.title}</span>
+                  <span className="text-sm text-neutral-700  ">{issue.body}</span>
+                  <span className="text-sm text-red-400">{issue.labels.map((l)=>(<span>{l}</span>))}</span>
                   <a className="text-blue-400">{issue.url}</a>
                 </div>
               ))
-            )
           )}
         </div>
       </div>

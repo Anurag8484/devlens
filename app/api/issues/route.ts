@@ -8,7 +8,12 @@ export async function GET() {
         const issueRequests = repos.map(async (repo) => {
           try {
             const res = await axios.get(
-              `https://api.github.com/repos/${repo.owner}/${repo.name}/issues`
+              `https://api.github.com/repos/${repo.owner}/${repo.name}/issues`,{
+                headers:{
+                  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                  Accept:"application/vnd.github+json"
+                }
+              }
             );
       
             return{
@@ -27,8 +32,24 @@ export async function GET() {
       
         const validResults = results.filter(Boolean);
 
+        const filteredIssues = validResults.flatMap((repo) =>
+          repo?.issues
+            .filter((issue: any) => !issue.pull_request)
+            .map((issue: any) => ({
+              id: issue.number,
+              body: issue.body,
+              title: issue.title,
+              state: issue.state,
+              labels: issue.labels.map((l: any) => l.name),
+              comments: issue.comments,
+              createdAt: issue.created_at,
+              updatedAt: issue.updated_at,
+              url: issue.html_url,
+            }))
+        );
+
         return NextResponse.json({
-            data: validResults
+            data: filteredIssues
         });
     } catch (error) {
         console.log(error);
