@@ -2,10 +2,20 @@ import prisma from "@/db/prisma";
 import { AddRepoSchema } from "@/lib/types";
 import { parseUrl } from "@/lib/utils/parseUrl";
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
 
 export async function GET() {
+
+ const session = await getServerSession(authOptions);
+ const userId = parseInt(session?.user.id || "2");
   try {
-    const repos = await prisma.repository.findMany();
+    const repos = await prisma.repository.findMany({
+      where: {
+        userId,
+      }
+    });
     return NextResponse.json(
       {
         repos: repos,
@@ -24,6 +34,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+
+ const session = await getServerSession(authOptions);
+ const userId = parseInt(session?.user.id || "2");
   const data = await req.json();
   const parsedData = AddRepoSchema.safeParse(data);
   const githubUrl =  parsedData.data?.githubUrl ?? "";
@@ -55,7 +68,8 @@ export async function POST(req: NextRequest) {
         githubUrl: parsedData.data.githubUrl,
         owner: owner,
         type: parsedData.data.type,
-        name:name
+        name:name,
+        userId 
       },
     });
     return NextResponse.json({
