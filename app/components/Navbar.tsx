@@ -50,7 +50,7 @@
 //   );
 // }
 "use client";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -150,19 +150,15 @@ export default function Navbar() {
           )}
           {status === "authenticated" && (
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  router.push("/api/auth/signout");
-                }}
-                className="gap-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign out
-              </Button>
+                <LogOut
+                  className="w-4 h-4 hover:scale-110 duration-200 hover:text-red-600"
+                  onClick={() => {
+                    signOut();
+                  }}
+                />
               <Avatar className="h-9 w-9 border-2 border-black/20 dark:border-white/20">
                 <AvatarImage
-                  src={session.user?.image ?? ("/placeholder.svg")}
+                  src={session.user?.image ?? "/placeholder.svg"}
                   alt={session.user?.name ?? "User"}
                 />
                 <AvatarFallback className="bg-black dark:bg-white text-white dark:text-black">

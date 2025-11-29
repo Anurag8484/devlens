@@ -59,7 +59,7 @@ export default function(){
     return (
       <Dialog open={open}>
         <DialogTrigger asChild>
-          <Button variant="default" onClick={()=>setOpen(true)}>Add Repo to Track</Button>
+          <Button variant="outline" onClick={()=>setOpen(true)}>Add Repo to Track</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <form onSubmit={addRepo}>
