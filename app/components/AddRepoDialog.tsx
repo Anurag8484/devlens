@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function(){
 
@@ -30,8 +31,10 @@ export default function(){
     const ownerRef = useRef<HTMLInputElement>(null);
     const [type,setType] = useState('');
     const [open,setOpen] = useState(false)
+    const router = useRouter();
 
     const  addRepo = async(e:React.FormEvent) =>{
+
         e.preventDefault();
         const githubUrl = urlRef.current?.value;
 
@@ -43,6 +46,7 @@ export default function(){
             if(res.status === 201){
               toast("Repo added to db")
               setOpen(false)
+              router.refresh();
             }
           })
 

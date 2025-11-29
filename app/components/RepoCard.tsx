@@ -1,63 +1,82 @@
+'use client'
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import axios from "axios";
+import { CircleAlert, GitBranch, SquareArrowOutUpRight } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export function CardDemo() {
+interface Repo {
+  id: number;
+  githubUrl: string;
+  owner: string;
+  type: string;
+  name: string;
+}
+
+export function RepoCard() {
+  const [repos,setRepos] = useState<Repo[]>([])
+  const [loading,setLoading] =useState<Boolean>(false);
+  useEffect(() => {
+    setLoading(true);
+    const fetchRepos = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/repo");
+        const formatted:Repo[] = res.data.repos.map((r: any) => ({
+          id: r.id,
+          githubUrl: r.githubIrl || r.githubUrl,
+          owner: r.owner,
+          type: r.type,
+          name: r.name
+        }));
+        setRepos(formatted);
+        console.log(repos)
+      } catch (err) {
+        console.error("Error fetching repos:", err);
+      } finally {
+      }
+    };
+    fetchRepos();
+  }, []);
   return (
-    <Card className="w-full max-w-sm">
+    <div className="grid grid-cols-3 gap-y-6">
+    
+    {repos.map((repo:Repo)=>(
+    <Card key={repo.id} className="w-full max-w-sm dark:text-white">
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
-        <CardAction>
-          <Button variant="link">Sign Up</Button>
-        </CardAction>
+        <CardTitle className="flex gap-2 ">
+          <GitBranch size={20} className="text-blue-500"/>
+          <Link href={repo.githubUrl} target="blank">
+           <Badge  variant={"secondary"} className="flex">Github <SquareArrowOutUpRight/></Badge>
+          </Link>
+          </CardTitle>
       </CardHeader>
-      <CardContent>
-        <form>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-          </div>
-        </form>
+      <CardContent className="flex flex-col gap-4">
+        <div  className="flex flex-col gap-1">
+        <span className="text-neutral-500 text-[.8rem]">
+          {repo.owner}
+        </span>
+        <span className="font-semibold">
+          {repo.name}
+        </span>
+        </div>
+        <div>
+        <Badge variant={"outline"}> <CircleAlert/> {repo.type} </Badge>
+        </div>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Login
-        </Button>
-        <Button variant="outline" className="w-full">
-          Login with Google
+        <Button variant="secondary" className="w-full">
+         Issues
         </Button>
       </CardFooter>
-    </Card>
+    </Card>))}
+    </div>
   );
 }
