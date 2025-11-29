@@ -24,11 +24,11 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { emitGlobal } from "../hooks/useRefresh";
 
 export default function(){
 
     const urlRef = useRef<HTMLInputElement>(null);
-    const ownerRef = useRef<HTMLInputElement>(null);
     const [type,setType] = useState('');
     const [open,setOpen] = useState(false)
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function(){
             if(res.status === 201){
               toast("Repo added to db")
               setOpen(false)
-              router.refresh();
+              emitGlobal("repos:update")
             }
           })
 
