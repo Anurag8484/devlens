@@ -86,7 +86,7 @@
 //   );
 // };
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -110,17 +110,43 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Link from "next/link";
+import axios from "axios";
+// type Issue = {
+//   id: number;
+//   title: string;
+//   url: string;
+//   body: string;
+//   state: string;
+//   labels: string[];
+//   comments: number;
+//   createdAt: string;
+//   updatedAt: string;
+// }
+
+// // type Repo = {
+// //   repoId: number;
+// //   name: string;
+// //   owner: string;
+// //   issues: Issue[];
+// // }
 
 interface Issue {
   id: number;
   title: string;
   body: string;
+  state: string;
   labels: string[];
   comments: number;
   createdAt: string;
-  repoName: string;
-  repoOwner: string;
   url: string;
+  name: string;
+  owner: string;
+}
+
+interface Repo{
+  repoId: number;
+
+  issues: Issue[]
 }
 
 const Issues = () => {
@@ -130,42 +156,60 @@ const Issues = () => {
   const [selectedLabel, setSelectedLabel] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
 
+  const [issues, setIssues] = useState<Issue[]>([]);
+
+    useEffect(()=>{
+      const fetchIssues = async()=>{
+        try {
+          await axios.get("http://localhost:3000/api/issues").then(res=>{
+            setIssues(res.data.data);
+            console.log(res.data.filteredData);
+          })
+
+        } catch (error) {
+          console.log("Error fetching issues, ", error);
+        }
+      }
+
+      fetchIssues();
+    },[])
+
   // Mock data
-  const issues: Issue[] = [
-    {
-      id: 1,
-      title: "Add TypeScript support for new API",
-      body: "We need to add proper TypeScript definitions for the new API endpoints...",
-      labels: ["enhancement", "typescript"],
-      comments: 12,
-      createdAt: "2024-11-20",
-      repoName: "react",
-      repoOwner: "facebook",
-      url: "https://github.com/facebook/react/issues/1",
-    },
-    {
-      id: 2,
-      title: "Memory leak in production build",
-      body: "There seems to be a memory leak when using the production build with...",
-      labels: ["bug", "critical"],
-      comments: 8,
-      createdAt: "2024-11-18",
-      repoName: "typescript",
-      repoOwner: "microsoft",
-      url: "https://github.com/microsoft/typescript/issues/2",
-    },
-    {
-      id: 3,
-      title: "Documentation improvements needed",
-      body: "The current documentation lacks examples for advanced use cases...",
-      labels: ["documentation"],
-      comments: 5,
-      createdAt: "2024-11-15",
-      repoName: "next.js",
-      repoOwner: "vercel",
-      url: "https://github.com/vercel/next.js/issues/3",
-    },
-  ];
+  // const issues: Issue[] = [
+  //   {
+  //     id: 1,
+  //     title: "Add TypeScript support for new API",
+  //     body: "We need to add proper TypeScript definitions for the new API endpoints...",
+  //     labels: ["enhancement", "typescript"],
+  //     comments: 12,
+  //     createdAt: "2024-11-20",
+  //     repoName: "react",
+  //     repoOwner: "facebook",
+  //     url: "https://github.com/facebook/react/issues/1",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Memory leak in production build",
+  //     body: "There seems to be a memory leak when using the production build with...",
+  //     labels: ["bug", "critical"],
+  //     comments: 8,
+  //     createdAt: "2024-11-18",
+  //     repoName: "typescript",
+  //     repoOwner: "microsoft",
+  //     url: "https://github.com/microsoft/typescript/issues/2",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Documentation improvements needed",
+  //     body: "The current documentation lacks examples for advanced use cases...",
+  //     labels: ["documentation"],
+  //     comments: 5,
+  //     createdAt: "2024-11-15",
+  //     repoName: "next.js",
+  //     repoOwner: "vercel",
+  //     url: "https://github.com/vercel/next.js/issues/3",
+  //   },
+  // ];
 
   const repos = [
     "all",
@@ -188,7 +232,7 @@ const Issues = () => {
       .includes(searchQuery.toLowerCase());
     const matchesRepo =
       selectedRepo === "all" ||
-      `${issue.repoOwner}/${issue.repoName}` === selectedRepo;
+      `${issue.owner}/${issue.name}` === selectedRepo;
     const matchesLabel =
       selectedLabel === "all" || issue.labels.includes(selectedLabel);
 
@@ -324,7 +368,7 @@ const Issues = () => {
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="outline" className="gap-1">
                             <GitBranch className="w-3 h-3" />
-                            {issue.repoOwner}/{issue.repoName}
+                            {issue.owner}/{issue.name}
                           </Badge>
                           {issue.labels.map((label) => (
                             <Badge

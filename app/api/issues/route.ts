@@ -45,11 +45,14 @@ export async function GET() {
               createdAt: issue.created_at,
               updatedAt: issue.updated_at,
               url: issue.html_url,
+              owner: repo.owner,
+              name: repo.name
             }))
         );
 
         return NextResponse.json({
             data: filteredIssues
+
         });
     } catch (error) {
         console.log(error);
