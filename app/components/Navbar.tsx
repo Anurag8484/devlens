@@ -90,10 +90,10 @@ export default function Navbar() {
     }
   };
 
-  useEffect(() => {
-    const data = parseUrl("https://api.github.com/repos/code100x/cms/issues");
-    console.log(data);
-  }, []);
+  // useEffect(() => {
+  //   const data = parseUrl("https://api.github.com/repos/code100x/cms/issues");
+  //   console.log(data);
+  // }, []);
 
   if (!mounted) return null;
 

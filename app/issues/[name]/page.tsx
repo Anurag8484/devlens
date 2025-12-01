@@ -1,91 +1,4 @@
-'use client'
-// import { RefreshCcw } from "lucide-react"
-// import Navbar from "../components/Navbar"
-// import { useEffect, useState } from "react";
-// import axios from "axios";
-
-// type Issue = {
-//   id: number;
-//   title: string;
-//   url: string;
-//   body: string;
-//   state: string;
-//   labels: string[];
-//   comments: number;
-//   createdAt: string;
-//   updatedAt: string;
-// }
-
-// // type Repo = {
-// //   repoId: number;
-// //   name: string;
-// //   owner: string;
-// //   issues: Issue[];
-// // }
-
-
-// export default  function () {
-//   const [issues,setIssues] = useState<Issue[]>([]);
-//   useEffect(()=>{
-//     const fetchIssues = async()=>{
-//       try {
-//         await axios.get("http://localhost:3000/api/issues").then(res=>{
-//           setIssues(res.data.data);
-//           console.log(res.data.filteredData);
-//         })
-
-//       } catch (error) {
-//         console.log("Error fetching issues, ", error);
-//       }
-//     }
-
-//     fetchIssues();
-//   },[])
-//   return (
-//     <div className="m-5">
-//       <Navbar />
-//       <div className="">
-//         <div className=" flex justify-between">
-//           <span className="text-2xl">Issues</span>
-//           <RefreshCcw />
-//         </div>
-//         <hr />
-//         <div className="flex flex-col items-center my-10 gap-5">
-//           <div className="outline-1 w-full rounded-sm p-4 flex justify-around">
-//             <span>#</span>
-//             <span>Comments</span>
-//             <span>State</span>
-//             <span>title</span>
-//             <span>date</span>
-//             <span>labels</span>
-//             <span>Link</span>
-//           </div>
-//           {issues.length === 0 ? (
-//             <div className="flex justify-center items-center py-10 text-muted-foreground">
-//               Loading issues...
-//             </div>
-//           ) : (
-//               issues.map((issue, idx) => (
-//                 <div
-//                   key={idx}
-//                   className=" w-full  gap-10 bg-neutral-50 rounded-md  p-4 flex justify-around"
-//                 >
-//                   <span >{issue.id}</span>
-//                   <span >{issue.comments}</span>
-//                   <span >{issue.state}</span>
-//                   <span className="text-red-300  text-sm">{issue.title}</span>
-//                   <span className="text-sm text-neutral-700  ">{`${new Date(issue.createdAt)}`}</span>
-//                   <span className="text-sm text-red-400">{issue.labels.map((l,idx)=>(<span key={idx}>{l}</span>))}</span>
-//                   <a className="text-blue-400">{issue.url}</a>
-//                 </div>
-//               ))
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
+"use client"
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -108,27 +21,11 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import Navbar from "../components/Navbar";
 import Link from "next/link";
 import axios from "axios";
-// type Issue = {
-//   id: number;
-//   title: string;
-//   url: string;
-//   body: string;
-//   state: string;
-//   labels: string[];
-//   comments: number;
-//   createdAt: string;
-//   updatedAt: string;
-// }
-
-// // type Repo = {
-// //   repoId: number;
-// //   name: string;
-// //   owner: string;
-// //   issues: Issue[];
-// // }
+import Navbar from "@/app/components/Navbar";
+import { toast } from "sonner";
+import CustomSpinner from "@/app/components/CustomSpinner";
 
 interface Issue {
   id: number;
@@ -143,74 +40,46 @@ interface Issue {
   owner: string;
 }
 
-interface Repo{
+interface Repo {
   repoId: number;
 
-  issues: Issue[]
+  issues: Issue[];
 }
 
-const Issues = () => {
+const Issues = ({ params } : {params:{name:string}}) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("all");
   const [selectedLabel, setSelectedLabel] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
-
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState(false);
+  const [refresh,setRefresh] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
-
-    useEffect(()=>{
-      const fetchIssues = async()=>{
-        try {
-          await axios.get("http://localhost:3000/api/issues").then(res=>{
-            setIssues(res.data.data);
-            console.log(res.data.filteredData);
-          })
-
-        } catch (error) {
-          console.log("Error fetching issues, ", error);
-        }
+  
+  useEffect(() => {
+    setLoading(true);
+      const fetchIssues = async () => {
+          try {
+              const paramsData = await params;
+              const name =  paramsData.name;
+        await axios.post(`http://localhost:3000/api/issues/`,{name:name}).then((res) => {
+          setIssues(res.data.filteredIssues);
+          setLoading(false);
+          setRefresh(false)
+        });
+      } catch (error) {
+        console.log("Error fetching issues, ", error);
+        toast("Error fetching issues;")
+        setError(true);
+        
       }
+    };
 
-      fetchIssues();
-    },[])
+    fetchIssues();
+  }, [refresh]);
 
-  // Mock data
-  // const issues: Issue[] = [
-  //   {
-  //     id: 1,
-  //     title: "Add TypeScript support for new API",
-  //     body: "We need to add proper TypeScript definitions for the new API endpoints...",
-  //     labels: ["enhancement", "typescript"],
-  //     comments: 12,
-  //     createdAt: "2024-11-20",
-  //     repoName: "react",
-  //     repoOwner: "facebook",
-  //     url: "https://github.com/facebook/react/issues/1",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Memory leak in production build",
-  //     body: "There seems to be a memory leak when using the production build with...",
-  //     labels: ["bug", "critical"],
-  //     comments: 8,
-  //     createdAt: "2024-11-18",
-  //     repoName: "typescript",
-  //     repoOwner: "microsoft",
-  //     url: "https://github.com/microsoft/typescript/issues/2",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Documentation improvements needed",
-  //     body: "The current documentation lacks examples for advanced use cases...",
-  //     labels: ["documentation"],
-  //     comments: 5,
-  //     createdAt: "2024-11-15",
-  //     repoName: "next.js",
-  //     repoOwner: "vercel",
-  //     url: "https://github.com/vercel/next.js/issues/3",
-  //   },
-  // ];
-
+  
   const repos = [
     "all",
     "facebook/react",
@@ -225,8 +94,37 @@ const Issues = () => {
     "typescript",
     "critical",
   ];
+  const normalize = (label: string) =>
+    label.toLowerCase().replace(/[^a-z0-9]+/gi, "-");
+  const allLabels = [
+    "all",
+    ...Array.from(
+      new Set(
+        issues.flatMap((issue) => issue.labels.map((label) => normalize(label)))
+      )
+    ),
+  ];
 
-  
+
+  const filteredIssues = issues.filter((issue) => {
+    const matchesSearch = issue.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesRepo =
+      selectedRepo === "all" || `${issue.owner}/${issue.name}` === selectedRepo;
+    const matchesLabel =
+      selectedLabel === "all" ||
+      issue.labels.some((label) => normalize(label) === selectedLabel);
+
+    let matchesTime = true;
+    if (timeFilter === "6months") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12);
+      matchesTime = new Date(issue.createdAt) >= sixMonthsAgo;
+    }
+
+    return matchesSearch && matchesRepo && matchesLabel && matchesTime;
+  });
 
   const getLabelColor = (label: string) => {
     const colors: Record<string, string> = {
@@ -247,7 +145,7 @@ const Issues = () => {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-4xl font-bold">Issues</h1>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={()=>setRefresh(true)}>
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </Button>
@@ -256,7 +154,6 @@ const Issues = () => {
               All issues from your tracked repositories
             </p>
           </div>
-
           <Card className="p-6 mb-6 border-border/50">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative">
@@ -287,7 +184,7 @@ const Issues = () => {
                   <SelectValue placeholder="All labels" />
                 </SelectTrigger>
                 <SelectContent>
-                  {labels.map((label) => (
+                  {allLabels.map((label) => (
                     <SelectItem key={label} value={label}>
                       {label === "all" ? "All labels" : label}
                     </SelectItem>
@@ -306,9 +203,10 @@ const Issues = () => {
               </Select>
             </div>
           </Card>
-
+      { loading ? <CustomSpinner/> : 
+          
           <div className="space-y-4">
-            {issues.length === 0 ? (
+            {filteredIssues.length === 0 ? (
               <Card className="p-12 text-center border-border/50">
                 <h3 className="text-xl font-semibold mb-2">No Issues Found</h3>
                 <p className="text-muted-foreground mb-6">
@@ -319,18 +217,18 @@ const Issues = () => {
                 </Button>
               </Card>
             ) : (
-              issues.map((issue, index) => (
+              filteredIssues.map((issue, index) => (
                 <motion.div
-                  key={issue.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                key={issue.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
                 >
                   <Card
                     key={issue.id}
                     className="p-6 hover:shadow-md transition-shadow border-border/50 cursor-pointer"
                     onClick={() => router.push(`/issues/${issue.id}`)}
-                  >
+                    >
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
                         <div className="flex items-start gap-3">
@@ -342,7 +240,7 @@ const Issues = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
+                            >
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         </div>
@@ -354,9 +252,9 @@ const Issues = () => {
                           </Badge>
                           {issue.labels.map((label) => (
                             <Badge
-                              key={label}
-                              variant="outline"
-                              className={getLabelColor(label)}
+                            key={label}
+                            variant="outline"
+                            className={getLabelColor(label)}
                             >
                               {label}
                             </Badge>
@@ -379,7 +277,7 @@ const Issues = () => {
                 </motion.div>
               ))
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </div>
@@ -387,4 +285,3 @@ const Issues = () => {
 };
 
 export default Issues;
-

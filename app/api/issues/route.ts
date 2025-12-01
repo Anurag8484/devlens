@@ -62,3 +62,63 @@ export async function GET() {
     };
 
 }
+
+
+export async function POST(req:NextRequest){
+  const data = await req.json();
+  const name = data.name;
+  console.log(`Repo name is ${name}`)
+
+  try {
+    const repo = await prisma.repository.findFirstOrThrow
+    ({
+      where:{
+        name
+      }
+    });
+
+    if(repo === null){
+      return NextResponse.json({
+        message: "Repo not found"
+      }, {status:402})
+    }
+     const res = await axios.get(
+       `https://api.github.com/repos/${repo.owner}/${repo.name}/issues?per_page=100`,
+       {
+         headers: {
+           Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+           Accept: "application/vnd.github+json",
+         },
+       }
+     );
+     const issues = res.data;
+
+     const filteredIssues = issues
+       .filter((issue: any) => !issue.pull_request)
+       .map((issue: any) => ({
+         id: issue.number,
+         body: issue.body,
+         title: issue.title,
+         state: issue.state,
+         labels: issue.labels.map((l: any) => l.name),
+         comments: issue.comments,
+         createdAt: issue.created_at,
+         updatedAt: issue.updated_at,
+         url: issue.html_url,
+         owner: repo.owner,
+         name: repo.name,
+       }));
+       console.log("--------------")
+     return NextResponse.json({
+      filteredIssues
+     })
+
+
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({
+      message: "Internal Server Error 3.0"
+    }, {status:500})
+  }
+
+}
