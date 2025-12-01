@@ -67,7 +67,6 @@ export async function GET() {
 export async function POST(req:NextRequest){
   const data = await req.json();
   const name = data.name;
-  console.log(`Repo name is ${name}`)
 
   try {
     const repo = await prisma.repository.findFirstOrThrow
@@ -108,7 +107,6 @@ export async function POST(req:NextRequest){
          owner: repo.owner,
          name: repo.name,
        }));
-       console.log("--------------")
      return NextResponse.json({
       filteredIssues
      })

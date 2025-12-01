@@ -227,7 +227,7 @@ const Issues = ({ params } : {params:{name:string}}) => {
                   <Card
                     key={issue.id}
                     className="p-6 hover:shadow-md transition-shadow border-border/50 cursor-pointer"
-                    onClick={() => router.push(`/issues/${issue.id}`)}
+                    onClick={() => router.push(`/issues/detail/${issue.owner}/${encodeURIComponent(issue.name)}/${issue.id}`)}
                     >
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
