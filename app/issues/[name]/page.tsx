@@ -27,14 +27,16 @@ import Navbar from "@/app/components/Navbar";
 import { toast } from "sonner";
 import CustomSpinner from "@/app/components/CustomSpinner";
 
-interface Issue {
+export interface Issue {
   id: number;
   title: string;
+  number:number;
   body: string;
   state: string;
   labels: string[];
   comments: number;
   createdAt: string;
+  htmlBody: string
   url: string;
   name: string;
   owner: string;

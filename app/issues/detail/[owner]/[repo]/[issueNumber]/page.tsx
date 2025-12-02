@@ -13,59 +13,60 @@ import { ArrowLeft, Calendar, GitBranch, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Showdown from "showdown";
 import axios from "axios";
+import { Issue } from "@/app/issues/[name]/page";
 
 export default function IssueDetail({params}:{params:{owner:string, repo:string, issueNumber: string}}) {
   const router = useRouter();
+  const [issue, setIssue] = useState<Issue>();
 
+const converter = new Showdown.Converter({
+  tables: true,
+  ghCompatibleHeaderId: true,
+  ghCodeBlocks: true,
+  strikethrough: true,
+  tasklists: true,
+  simpleLineBreaks: true,
+  emoji: true,
+  simplifiedAutoLink: true,
+  openLinksInNewWindow: true,
+  metadata: true,
+});
+converter.setFlavor("github");
+
+  
+  
   useEffect(()=>{
     const fetchIssue = async()=>{
-        const paramData = await params;
-        const {owner, repo, issueNumber} = paramData;
-        try {
-            const res = await axios.get(
-              `https://api.github.com/repos/${owner}/${decodeURIComponent(repo)}/issues/${issueNumber}`
-            );
-            console.log("asbdjhabsjhdbaskhbdkhasdbkhbasjbdkjsbda")
-            console.log(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    };
+      const paramData = await params;
+      const owner = paramData.owner;
+      const repo = paramData.repo;
+      const issueNumber = paramData.issueNumber
+      try {
+        const res = await axios.get(
+          `https://api.github.com/repos/${owner}/${decodeURIComponent(repo)}/issues/${issueNumber}`
+        );
+        const markdownHTML = converter.makeHtml(res.data.body);
 
+        setIssue({
+          ...res.data,
+          owner,
+          name: repo,
+          number: issueNumber,
+          htmlBody: markdownHTML,
+        });
+      } catch (error) {
+        console.log(error)
+      }
+    };
+    
     fetchIssue();
   },[])
+    if (!issue) return <div className="p-8">Loading issue...</div>;
 
-  // Mock issue data - replace with real data later
-  const issue = {
-    id:  "1",
-    title: "Bug: Application crashes on startup",
-    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-
-## Steps to Reproduce
-1. Launch the application
-2. Click on the settings menu
-3. Observe the crash
-
-## Expected Behavior
-The application should remain stable and display the settings menu.
-
-## Actual Behavior
-The application crashes immediately after clicking the settings menu.
-
-## Environment
-- OS: Windows 11
-- Version: 2.3.1
-- Browser: Chrome 120`,
-    status: "open",
-    createdAt: "2024-01-15",
-    repoName: "awesome-project",
-    repoOwner: "johndoe",
-    labels: ["bug", "high-priority", "needs-investigation"],
-    comments: 8,
-  };
-
+  
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -91,55 +92,56 @@ The application crashes immediately after clicking the settings menu.
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-2xl mb-2">
-                      {issue.title}
+                      {issue?.title}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">
-                        {issue.repoOwner}/{issue.repoName}
+                        {issue?.owner}/{issue?.name}
                       </span>
                       <span>•</span>
-                      <span>#{issue.id}</span>
+                      <span>#{issue?.number}</span>
                     </CardDescription>
                   </div>
                   <Badge
-                    variant={issue.status === "open" ? "default" : "secondary"}
+                    variant={issue?.state === "open" ? "default" : "secondary"}
                     className="shrink-0"
                   >
-                    {issue.status}
+                    {issue?.state}
                   </Badge>
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Created {issue.createdAt}</span>
+                    <span>Created {issue?.createdAt}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <MessageSquare className="h-4 w-4" />
-                    <span>{issue.comments} comments</span>
+                    <span>{issue?.comments} comments</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  {issue.labels.map((label) => (
-                    <Badge key={label} variant="outline">
-                      {label}
-                    </Badge>
-                  ))}
+                  {issue?.labels
+                    .map((l: any) => l.name)
+                    .map((label) => (
+                      <Badge key={label} variant="outline">
+                        {label}
+                      </Badge>
+                    ))}
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                <div className="whitespace-pre-wrap text-foreground">
-                  {issue.description}
-                </div>
-              </div>
+              <div
+                className="prose prose-sm dark:prose-invert max-w-none mt-6"
+                dangerouslySetInnerHTML={{ __html: issue.htmlBody }}
+              />
 
               <div className="mt-8 pt-6 border-t">
                 <Button variant="outline" className="hover-scale" asChild>
                   <a
-                    href={`https://github.com/${issue.repoOwner}/${issue.repoName}/issues/${issue.id}`}
+                    href={`https://github.com/${issue?.owner}/${issue?.name}/issues/${issue?.number}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
