@@ -64,7 +64,9 @@ converter.setFlavor("github");
     
     fetchIssue();
   },[])
-    if (!issue) return <div className="p-8">Loading issue...</div>;
+  if (!issue) return <div className="p-8">Loading issue...</div>;
+  console.log("99899=-----")
+  console.log(issue?.body)
 
   
   return (
