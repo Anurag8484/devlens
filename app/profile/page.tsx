@@ -24,8 +24,9 @@ export default function(){
   useEffect(()=>{
     const fetchUser = async()=>{
      const res = await axios.get(`/api/user`)
-    console.log(res.data)
-     setUser(res.data);
+    console.log(res.data.user)
+     setUser(res.data.user);
+
     }
 
     fetchUser();
@@ -83,7 +84,7 @@ export default function(){
           ) : (
             <InputGroup>
               <InputGroupTextarea
-                placeholder="Add to your bio"
+                placeholder="User Bio"
                 disabled
                 value={user?.bio}
               />

@@ -9,12 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import axios, { Axios } from "axios";
-import { CircleAlert, GitBranch, SquareArrowOutUpRight } from "lucide-react";
+import { CircleAlert, GitBranch, SquareArrowOutUpRight, Trash } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import CustomSpinner from "./CustomSpinner";
-import { useGlobalEmmit } from "../hooks/useRefresh";
-import { useRouter } from "next/navigation";
+import { emitGlobal, useGlobalEmmit } from "../hooks/useRefresh";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Repo {
   id: number;
@@ -25,6 +26,8 @@ interface Repo {
 }
 
 export function RepoCard() {
+  const pathname = usePathname();
+  const isProfile = pathname==="/profile"
   const router = useRouter();
   const [repos,setRepos] = useState<Repo[]>([])
   const [loading,setLoading] =useState<Boolean>(false);
@@ -33,7 +36,9 @@ export function RepoCard() {
    const fetchRepos = useCallback(async () => {
      try {
       setLoading(true)
-       const res = await axios.get("http://localhost:3000/api/repo");
+       const res = await axios.get("http://localhost:3000/api/user/repo");
+
+       console.log(res.data)
        
        const formatted:Repo[] = res.data.repos.map((r: any) => ({
          id: r.id,
@@ -56,6 +61,7 @@ export function RepoCard() {
   },[fetchRepos]);
 
   useGlobalEmmit("repos:update",fetchRepos)
+  useGlobalEmmit("repos:delete",fetchRepos)
 
   return (
     <>
@@ -67,12 +73,32 @@ export function RepoCard() {
             <Card key={repo.id} className="w-full max-w-sm dark:text-white">
               <CardHeader>
                 <CardTitle className="flex gap-2 ">
+                  <div className=" flex justify-between w-full">
+                    <div className="flex">
                   <GitBranch size={20} className="text-blue-500" />
                   <Link href={repo.githubUrl} target="blank">
                     <Badge variant={"secondary"} className="flex">
                       Github <SquareArrowOutUpRight />
                     </Badge>
                   </Link>
+                    </div>
+                    {isProfile ? 
+                    <Trash size={16} className="text-red-600 cursor-pointer hover:text-red-800" onClick={async ()=>{
+                        await axios.delete(`/api/user/repo?id=${repo.id}`).then((res)=>{
+                          if(res.status===200){
+                            toast("Repository deleted!");
+                            emitGlobal("repos:delete")
+                            return;
+                          }else{
+                            toast("Error occured while deleting!")
+                            return;
+                          };
+                    });
+
+                    }}/>
+                    
+                    :<></>}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">

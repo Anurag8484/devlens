@@ -19,7 +19,7 @@ model User{
   emailVerified  DateTime?
   bio String?
   image          String?
-  repos           Repository[]
+  repos           Repository[] @relation("UserRepos")
   accounts       Account[]
   sessions       Session[]
 }
@@ -67,8 +67,9 @@ model Repository {
   owner     String
   type      String?
   issues    Issue[]
-  user      User @relation(fields: [userId], references: [id])
-  userId    Int
+  user      User[]      @relation("UserRepos")
+  @@unique([name, owner], name: "name_owner")
+
 }
 
 model Issue {

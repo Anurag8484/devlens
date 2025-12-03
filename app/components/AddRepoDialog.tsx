@@ -39,7 +39,7 @@ export default function(){
         const githubUrl = urlRef.current?.value;
 
         try {
-          await axios.post('http://localhost:3000/api/repo',{
+          await axios.post('http://localhost:3000/api/user/repo',{
             githubUrl,
             type
           }).then((res)=>{
