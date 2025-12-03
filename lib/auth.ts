@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = Number(user.id); // attach Prisma user.id
+        token.id = Number(user.id);
       }
       return token;
     },
