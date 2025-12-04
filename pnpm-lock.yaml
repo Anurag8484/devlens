@@ -89,6 +89,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      openai:
+        specifier: ^6.9.1
+        version: 6.9.1(zod@4.1.12)
       prisma:
         specifier: ^7.0.1
         version: 7.0.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
@@ -144,6 +147,9 @@ importers:
       '@types/showdown':
         specifier: ^2.0.6
         version: 2.0.6
+      baseline-browser-mapping:
+        specifier: ^2.9.0
+        version: 2.9.0
       eslint:
         specifier: ^9
         version: 9.38.0(jiti@2.6.1)
@@ -1609,8 +1615,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.8.20:
-    resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
+  baseline-browser-mapping@2.9.0:
+    resolution: {integrity: sha512-Mh++g+2LPfzZToywfE1BUzvZbfOY52Nil0rn9H1CPC5DJ7fX+Vir7nToBeoiSbB1zTNeGYbELEvJESujgGrzXw==}
     hasBin: true
 
   brace-expansion@1.1.12:
@@ -2909,6 +2915,18 @@ packages:
   oidc-token-hash@5.1.1:
     resolution: {integrity: sha512-D7EmwxJV6DsEB6vOFLrBM2OzsVgQzgPWyHlV2OOAVj772n+WTXpudC9e9u5BVKQnYwaD30Ivhi9b+4UeBcGu9g==}
     engines: {node: ^10.13.0 || >=12.0.0}
+
+  openai@6.9.1:
+    resolution: {integrity: sha512-vQ5Rlt0ZgB3/BNmTa7bIijYFhz3YBceAA3Z4JuoMSBftBF9YqFHIEhZakSs+O/Ad7EaoEimZvHxD5ylRjN11Lg==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
 
   openid-client@5.7.1:
     resolution: {integrity: sha512-jDBPgSVfTnkIh71Hg9pRvtJc6wTwqjRkN88+gCFtYWrlP4Yx2Dsrow8uPi3qLr/aeymPF3o2+dS+wOpglK04ew==}
@@ -4961,7 +4979,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.8.20: {}
+  baseline-browser-mapping@2.9.0: {}
 
   brace-expansion@1.1.12:
     dependencies:
@@ -4978,7 +4996,7 @@ snapshots:
 
   browserslist@4.27.0:
     dependencies:
-      baseline-browser-mapping: 2.8.20
+      baseline-browser-mapping: 2.9.0
       caniuse-lite: 1.0.30001751
       electron-to-chromium: 1.5.240
       node-releases: 2.0.26
@@ -6605,6 +6623,10 @@ snapshots:
   ohash@2.0.11: {}
 
   oidc-token-hash@5.1.1: {}
+
+  openai@6.9.1(zod@4.1.12):
+    optionalDependencies:
+      zod: 4.1.12
 
   openid-client@5.7.1:
     dependencies:
