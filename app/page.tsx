@@ -1,18 +1,30 @@
 "use client";
 import Navbar from "./components/Navbar";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Github, Zap, Shield, GitBranch, Filter, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Github,
+  Zap,
+  Shield,
+  GitBranch,
+  Filter,
+  Sparkles,
+  LogOut,
+} from "lucide-react";
 import Footer from "./components/Footer";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Spinner } from "@/components/ui/spinner";
+import { AvatarFallback } from "@/components/ui/avatar";
 
 export default function LandingPage() {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const data = useSession();
-  console.log(data)
+  console.log(data);
   const router = useRouter();
 
   const companies = [
@@ -213,13 +225,56 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="gap-2" asChild>
                 <Link href="/dashboard">
-                  Get Started <ArrowRight className="w-4 h-4" />
+                  {status === "authenticated" && "Dashboard"}
+                  {status === "unauthenticated" && (
+                    <span className="flex items-center">
+                      Get Started <ArrowRight className="w-4 h-4" />
+                    </span>
+                  )}
+                  {status === "loading" && <Spinner className="w-5 h-5" />}
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="gap-2" onClick={()=>router.push('/login')}>
-                <Github className="w-5 h-5" />
-                Login with GitHub
-              </Button>
+              {status === "authenticated" && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => {
+                    signOut();
+                  }}
+                >
+                  <Github className="w-5 h-5" />
+                  LogOut
+                </Button>
+              )}
+              {status === "unauthenticated" && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => router.push("/login")}
+                >
+                  <Github className="w-5 h-5" />
+                  Login with GitHub
+                </Button>
+              )}
+              {status === "loading" && (
+                <Button size="lg" variant="outline" className="gap-2">
+                  <Spinner className="w-5 h-5" />
+                </Button>
+              )}
+
+              {/* : (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => router.push("/login")}
+                >
+                  <Github className="w-5 h-5" />
+                  Login with GitHub
+                </Button>
+              )} */}
             </div>
           </div>
         </div>

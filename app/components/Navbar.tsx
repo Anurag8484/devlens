@@ -58,12 +58,24 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { parseUrl } from "@/lib/utils/parseUrl";
 import { Github, LogOut, Moon, Sun } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const navlinks = [
+    {
+      title: "Profile",
+      link: "/profile",
+    },
+    {
+      title: "Dashboard",
+      link: "/dashboard",
+    },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -116,11 +128,17 @@ export default function Navbar() {
               <path d="M12 1v6m0 6v6M1 12h6m6 0h6M5.64 5.64l4.24 4.24m5.64 5.64l4.24 4.24M5.64 18.36l4.24-4.24m5.64-5.64l4.24-4.24" />
             </svg>
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-black to-black/70 dark:from-white dark:to-white/70 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-linear-to-r from-black to-black/70 dark:from-white dark:to-white/70 bg-clip-text text-transparent">
             DevLens
           </span>
         </div>
-
+        <div className="flex justify-between gap-10 text-neutral-700 font-medium hover:text-neutral-600 transition duration-200 tracking-wide ">
+          {navlinks.map((nlink, index) => (
+            <Link key={index} href={nlink.link}>
+              {nlink.title}
+            </Link>
+          ))}
+        </div>
         {/* Auth & Theme Section */}
         <div className="flex items-center gap-3">
           <Button
@@ -150,12 +168,12 @@ export default function Navbar() {
           )}
           {status === "authenticated" && (
             <div className="flex items-center gap-4">
-                <LogOut
-                  className="w-4 h-4 hover:scale-110 duration-200 hover:text-red-600"
-                  onClick={() => {
-                    signOut();
-                  }}
-                />
+              <LogOut
+                className="w-4 h-4 hover:scale-110 duration-200 hover:text-red-600"
+                onClick={() => {
+                  signOut();
+                }}
+              />
               <Avatar className="h-9 w-9 border-2 border-black/20 dark:border-white/20">
                 <AvatarImage
                   src={session.user?.image ?? "/placeholder.svg"}
