@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { AIStatsIssue } from "@/types/ai";
 import { safeParseAI } from "@/lib/utils/parseAIRes";
+import CustomSpinner from "@/app/components/CustomSpinner";
 
 export default function IssueDetail({
   params,
@@ -44,6 +45,7 @@ export default function IssueDetail({
   const router = useRouter();
   const [issue, setIssue] = useState<Issue>();
   const [aiStats, setAIStats] = useState<AIStatsIssue>();
+  const [ailoader, setAiLoader] = useState(true);
   let repo = "";
 
   const converter = new Showdown.Converter({
@@ -100,6 +102,7 @@ export default function IssueDetail({
             } else if (res.status === 202) {
               const data = res.data.issue;
               setAIStats(data);
+              setAiLoader(false);
               toast("Response Fetched from DB");
             } else {
               toast("Error getting response from AI");
@@ -133,46 +136,7 @@ export default function IssueDetail({
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Issues
           </Button>
-          <div className="shadow-lg p-7  hover:shadow-xl transition duration-200 border-neutral-200 border rounded-xl mb-5 ">
-            <h1 className="text-2xl mb-2 inline-block text-transparent bg-clip-text  bg-linear-to-r from-black via-red-600 to-neutral-700 text-clip font-semibold  ">
-              AI's Take
-            </h1>
-            <p className=" flex gap-3 text-neutral-600 font-medium">
-              {aiStats?.labels?.map((label, index) => (
-                <Badge key={index} variant={"outline"}>
-                  {label}
-                </Badge>
-              ))}
-            </p>
 
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xl mt-3 font-semibold text-neutral-700">
-                Description
-              </h3>
-              <p className="text-sm text-black font-medium ">
-                {aiStats?.summary}
-              </p>
-              <h3 className="text-xl mt-3 font-semibold text-neutral-700">
-                Difficulty
-              </h3>
-              <p className="text-sm text-black font-medium ">
-                {aiStats?.difficulty}
-              </p>
-              <h3 className="text-xl mt-3 font-semibold text-neutral-700">
-                Recommendations
-              </h3>
-              <p className="text-sm text-black font-medium ">
-                {aiStats?.recommended}
-              </p>
-            </div>
-
-            <Badge
-              variant={"outline"}
-              className="mt-7 font-semibold text-transparent bg-clip-text  bg-linear-to-r from-neutral-900 via-red-600 to-neutral-700 text-clip "
-            >
-              <AsteriskIcon className="text-black" /> DevAI
-            </Badge>
-          </div>
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="space-y-4">
@@ -239,6 +203,53 @@ export default function IssueDetail({
               </div>
             </CardContent>
           </Card>
+
+          <div className="shadow-lg p-7  hover:shadow-xl transition duration-200 border-neutral-200 border rounded-xl mt-5 ">
+            {!ailoader && (
+              <div>
+                <h1 className="text-2xl mb-2 inline-block text-transparent bg-clip-text  bg-linear-to-r from-black via-red-600 to-neutral-700 text-clip font-semibold  ">
+                  AI's Take
+                </h1>
+                <p className=" flex gap-3 text-neutral-600 font-medium">
+                  {aiStats?.labels?.map((label, index) => (
+                    <Badge key={index} variant={"outline"}>
+                      {label}
+                    </Badge>
+                  ))}
+                </p>
+
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                    Description
+                  </h3>
+                  <p className="text-sm text-black font-medium ">
+                    {aiStats?.summary}
+                  </p>
+                  <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                    Difficulty
+                  </h3>
+                  <p className="text-sm text-black font-medium ">
+                    {aiStats?.difficulty}
+                  </p>
+                  {/* <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                Recommendations
+                </h3>
+                <p className="text-sm text-black font-medium ">
+                {aiStats?.recommended}
+                </p> */}
+                </div>
+
+                <Badge
+                  variant={"outline"}
+                  className="mt-7 font-semibold text-transparent bg-clip-text  bg-linear-to-r from-neutral-900 via-red-600 to-neutral-700 text-clip "
+                >
+                  <AsteriskIcon className="text-black" /> DevAI
+                </Badge>
+              </div>
+            )}
+
+            {ailoader && <CustomSpinner />}
+          </div>
         </motion.div>
       </div>
     </div>
