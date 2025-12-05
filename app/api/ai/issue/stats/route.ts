@@ -1,5 +1,6 @@
 import prisma from "@/db/prisma";
 import { openai } from "@/lib/openai";
+import { safeParseAI } from "@/lib/utils/parseAIRes";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -32,17 +33,33 @@ export async function POST(req: NextRequest) {
         `;
 
   try {
+    const repo = await prisma.repository.findFirst({
+      where: {
+        name: data.repo,
+        owner: data.owner,
+      },
+    });
+
+    if (!repo) {
+      throw new Error("Repo not found");
+    }
+    console.log(data);
+
     const issue = await prisma.issue.findFirst({
       where: {
-        githubId: data.number,
+        githubId: data.issue.number,
       },
     });
 
     if (issue) {
+      console.log("Issue found in DB");
       console.log(issue);
-      return NextResponse.json({
-        issue: issue,
-      });
+      return NextResponse.json(
+        {
+          issue: issue,
+        },
+        { status: 202 }
+      );
     }
     const completion = await openai.chat.completions.create({
       model: "openai/gpt-4o-mini",
@@ -55,6 +72,21 @@ export async function POST(req: NextRequest) {
     });
     console.log(completion.choices[0].message);
     const response = completion.choices[0].message;
+
+    const finaldata = safeParseAI(response.content ?? "");
+
+    const newIssue = await prisma.issue.create({
+      data: {
+        githubUrl: data.issue.html_url,
+        title: data.issue.title,
+        repoId: repo.id,
+        labels: finaldata.labels,
+        githubId: data.issue.number,
+        summary: finaldata.summary ?? "",
+        difficulty: finaldata.difficulty ?? "",
+      },
+    });
+
     return NextResponse.json(
       {
         issue: response,

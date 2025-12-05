@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,13 +30,13 @@ import CustomSpinner from "@/app/components/CustomSpinner";
 export interface Issue {
   id: number;
   title: string;
-  number:number;
+  number: number;
   body: string;
   state: string;
   labels: string[];
   comments: number;
   createdAt: string;
-  htmlBody: string
+  htmlBody: string;
   url: string;
   name: string;
   owner: string;
@@ -48,40 +48,40 @@ interface Repo {
   issues: Issue[];
 }
 
-const Issues = ({ params } : {params:{name:string}}) => {
+const Issues = ({ params }: { params: { name: string } }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("all");
   const [selectedLabel, setSelectedLabel] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
-  const [loading,setLoading] = useState(true);
-  const [error,setError] = useState(false);
-  const [refresh,setRefresh] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
-  
+
   useEffect(() => {
     setLoading(true);
-      const fetchIssues = async () => {
-          try {
-              const paramsData = await params;
-              const name =  paramsData.name;
-        await axios.post(`http://localhost:3000/api/issues/`,{name:name}).then((res) => {
-          setIssues(res.data.filteredIssues);
-          setLoading(false);
-          setRefresh(false)
-        });
+    const fetchIssues = async () => {
+      try {
+        const paramsData = await params;
+        const name = paramsData.name;
+        await axios
+          .post(`http://localhost:3000/api/issues/`, { name: name })
+          .then((res) => {
+            setIssues(res.data.filteredIssues);
+            setLoading(false);
+            setRefresh(false);
+          });
       } catch (error) {
         console.log("Error fetching issues, ", error);
-        toast("Error fetching issues;")
+        toast("Error fetching issues;");
         setError(true);
-        
       }
     };
 
     fetchIssues();
   }, [refresh]);
 
-  
   const repos = [
     "all",
     "facebook/react",
@@ -106,7 +106,6 @@ const Issues = ({ params } : {params:{name:string}}) => {
       )
     ),
   ];
-
 
   const filteredIssues = issues.filter((issue) => {
     const matchesSearch = issue.title
@@ -147,7 +146,12 @@ const Issues = ({ params } : {params:{name:string}}) => {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-4xl font-bold">Issues</h1>
-              <Button variant="outline" size="sm" className="gap-2" onClick={()=>setRefresh(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setRefresh(true)}
+              >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </Button>
@@ -205,81 +209,91 @@ const Issues = ({ params } : {params:{name:string}}) => {
               </Select>
             </div>
           </Card>
-      { loading ? <CustomSpinner/> : 
-          
-          <div className="space-y-4">
-            {filteredIssues.length === 0 ? (
-              <Card className="p-12 text-center border-border/50">
-                <h3 className="text-xl font-semibold mb-2">No Issues Found</h3>
-                <p className="text-muted-foreground mb-6">
-                  Try adjusting your filters or add more repositories
-                </p>
-                <Button asChild>
-                  <Link href="/add-repo">Add Repository</Link>
-                </Button>
-              </Card>
-            ) : (
-              filteredIssues.map((issue, index) => (
-                <motion.div
-                key={issue.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                >
-                  <Card
+          {loading ? (
+            <CustomSpinner />
+          ) : (
+            <div className="space-y-4">
+              {filteredIssues.length === 0 ? (
+                <Card className="p-12 text-center border-border/50">
+                  <h3 className="text-xl font-semibold mb-2">
+                    No Issues Found
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    Try adjusting your filters or add more repositories
+                  </p>
+                  <Button asChild>
+                    <Link href="/add-repo">Add Repository</Link>
+                  </Button>
+                </Card>
+              ) : (
+                filteredIssues.map((issue, index) => (
+                  <motion.div
                     key={issue.id}
-                    className="p-6 hover:shadow-md transition-shadow border-border/50 cursor-pointer"
-                    onClick={() => router.push(`/issues/detail/${issue.owner}/${encodeURIComponent(issue.name)}/${issue.id}`)}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Card
+                      key={issue.id}
+                      className="p-6 hover:shadow-md transition-shadow border-border/50 cursor-pointer"
+                      onClick={() =>
+                        router.push(
+                          `/issues/detail/${issue.owner}/${encodeURIComponent(
+                            issue.name
+                          )}/${issue.id}`
+                        )
+                      }
                     >
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-start gap-3">
-                          <h3 className="text-lg font-semibold leading-tight flex-1">
-                            {issue.title}
-                          </h3>
-                          <a
-                            href={issue.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground transition-colors"
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <h3 className="text-lg font-semibold leading-tight flex-1">
+                              {issue.title}
+                            </h3>
+                            <a
+                              href={issue.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-muted-foreground hover:text-foreground transition-colors"
                             >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        </div>
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </div>
 
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className="gap-1">
-                            <GitBranch className="w-3 h-3" />
-                            {issue.owner}/{issue.name}
-                          </Badge>
-                          {issue.labels.map((label) => (
-                            <Badge
-                            key={label}
-                            variant="outline"
-                            className={getLabelColor(label)}
-                            >
-                              {label}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="gap-1">
+                              <GitBranch className="w-3 h-3" />
+                              {issue.owner}/{issue.name}
                             </Badge>
-                          ))}
-                        </div>
+                            {issue.labels.map((label) => (
+                              <Badge
+                                key={label}
+                                variant="outline"
+                                className={getLabelColor(label)}
+                              >
+                                {label}
+                              </Badge>
+                            ))}
+                          </div>
 
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            {issue.comments} comments
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(issue.createdAt).toLocaleDateString()}
-                          </span>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-4 h-4" />
+                              {issue.comments} comments
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {new Date(issue.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))
-            )}
-          </div>}
+                    </Card>
+                  </motion.div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

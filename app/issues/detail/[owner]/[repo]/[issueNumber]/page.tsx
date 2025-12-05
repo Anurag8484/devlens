@@ -44,6 +44,7 @@ export default function IssueDetail({
   const router = useRouter();
   const [issue, setIssue] = useState<Issue>();
   const [aiStats, setAIStats] = useState<AIStatsIssue>();
+  let repo = "";
 
   const converter = new Showdown.Converter({
     tables: true,
@@ -63,7 +64,8 @@ export default function IssueDetail({
     const fetchIssue = async () => {
       const paramData = await params;
       const owner = paramData.owner;
-      const repo = paramData.repo;
+      repo = paramData.repo;
+
       const issueNumber = paramData.issueNumber;
       try {
         const res = await axios.get(
@@ -85,6 +87,8 @@ export default function IssueDetail({
         await axios
           .post("/api/ai/issue/stats", {
             issue: res.data,
+            repo,
+            owner,
           })
           .then((res) => {
             if (res.status === 200) {
@@ -93,6 +97,10 @@ export default function IssueDetail({
               console.log(data);
               setAIStats(data);
               toast("AI Response Fetched");
+            } else if (res.status === 202) {
+              const data = res.data.issue;
+              setAIStats(data);
+              toast("Response Fetched from DB");
             } else {
               toast("Error getting response from AI");
               return;
@@ -120,7 +128,7 @@ export default function IssueDetail({
           <Button
             variant="ghost"
             className="mb-6 hover-scale"
-            onClick={() => router.push("/issues")}
+            onClick={() => router.push(`/issues/${repo}`)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Issues

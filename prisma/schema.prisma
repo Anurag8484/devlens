@@ -79,15 +79,15 @@ model Issue {
 
   title  String
   body   String?
-  labels Json?
+  labels String[]
 
   repoId Int
   repo   Repository @relation(fields: [repoId], references: [id])
 
-  aiSummary    String?
-  aiDifficulty String?
-  aiLabels     String[]
-  aiUpdatedAt  DateTime?
+  summary    String?
+  difficulty String?
+  ailabels   String[]
+  updatedAt  DateTime?
 
   users UserIssue[]
 
@@ -103,9 +103,9 @@ model UserIssue {
   user  User  @relation(fields: [userId], references: [id])
   issue Issue @relation(fields: [issueId], references: [id])
 
-  aiApproach       String?
-  aiRecommendation String?
-  notes            String?
+  approach       String?
+  recommendation String?
+  notes          String?
 
   createdAt DateTime @default(now())
 
