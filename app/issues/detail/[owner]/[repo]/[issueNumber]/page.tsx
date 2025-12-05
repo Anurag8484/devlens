@@ -32,6 +32,9 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { AIStatsIssue } from "@/types/ai";
+import { safeParseAI } from "@/lib/utils/parseAIRes";
 
 export default function IssueDetail({
   params,
@@ -40,6 +43,7 @@ export default function IssueDetail({
 }) {
   const router = useRouter();
   const [issue, setIssue] = useState<Issue>();
+  const [aiStats, setAIStats] = useState<AIStatsIssue>();
 
   const converter = new Showdown.Converter({
     tables: true,
@@ -54,8 +58,6 @@ export default function IssueDetail({
     metadata: true,
   });
   converter.setFlavor("github");
-
-  const fetchAIStats = useCallback(async () => {}, []);
 
   useEffect(() => {
     const fetchIssue = async () => {
@@ -79,6 +81,23 @@ export default function IssueDetail({
           number: issueNumber,
           htmlBody: markdownHTML,
         });
+
+        await axios
+          .post("/api/ai/issue/stats", {
+            issue: res.data,
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              console.log(res.data);
+              const data = safeParseAI(res.data.issue.content);
+              console.log(data);
+              setAIStats(data);
+              toast("AI Response Fetched");
+            } else {
+              toast("Error getting response from AI");
+              return;
+            }
+          });
       } catch (error) {
         console.log(error);
       }
@@ -111,40 +130,31 @@ export default function IssueDetail({
               AI's Take
             </h1>
             <p className=" flex gap-3 text-neutral-600 font-medium">
-              <Badge variant={"outline"}>lables</Badge>
-              <Badge variant={"outline"}>lables</Badge>
+              {aiStats?.labels?.map((label, index) => (
+                <Badge key={index} variant={"outline"}>
+                  {label}
+                </Badge>
+              ))}
             </p>
 
             <div className="flex flex-col gap-2">
               <h3 className="text-xl mt-3 font-semibold text-neutral-700">
                 Description
               </h3>
-              <p className="text-sm text-neutral-700 ">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Mollitia tempore nulla inventore suscipit nemo, ipsum
-                consequatur iste animi assumenda doloremque eum laborum sit at
-                dignissimos quisquam facere accusantium, totam cupiditate
-                deserunt a. Explicabo, sunt.
+              <p className="text-sm text-black font-medium ">
+                {aiStats?.summary}
               </p>
               <h3 className="text-xl mt-3 font-semibold text-neutral-700">
-                Approach
+                Difficulty
               </h3>
-              <p className="text-sm text-neutral-700 ">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Mollitia tempore nulla inventore suscipit nemo, ipsum
-                consequatur iste animi assumenda doloremque eum laborum sit at
-                dignissimos quisquam facere accusantium, totam cupiditate
-                deserunt a. Explicabo, sunt.
+              <p className="text-sm text-black font-medium ">
+                {aiStats?.difficulty}
               </p>
               <h3 className="text-xl mt-3 font-semibold text-neutral-700">
                 Recommendations
               </h3>
-              <p className="text-sm text-neutral-700 ">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Mollitia tempore nulla inventore suscipit nemo, ipsum
-                consequatur iste animi assumenda doloremque eum laborum sit at
-                dignissimos quisquam facere accusantium, totam cupiditate
-                deserunt a. Explicabo, sunt.
+              <p className="text-sm text-black font-medium ">
+                {aiStats?.recommended}
               </p>
             </div>
 
