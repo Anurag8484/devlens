@@ -1,36 +1,39 @@
-'use client'
-import React, { useEffect, useRef, useState } from 'react'
-import Navbar from '../components/Navbar'
-import Image from 'next/image'
-import { useSession } from 'next-auth/react';
-import { Badge } from '@/components/ui/badge';
-import CustomSpinner from '../components/CustomSpinner';
-import { GitBranch, GithubIcon } from 'lucide-react';
-import { RepoCard } from '../components/RepoCard';
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
-import prisma from '@/db/prisma';
-import { toast } from 'sonner';
-import { User } from '@/types/user';
-import axios from 'axios';
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import Navbar from "../components/Navbar";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { Badge } from "@/components/ui/badge";
+import CustomSpinner from "../components/CustomSpinner";
+import { GitBranch, GithubIcon } from "lucide-react";
+import { RepoCard } from "../components/RepoCard";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
+import prisma from "@/db/prisma";
+import { toast } from "sonner";
+import { User } from "@/types/user";
+import axios from "axios";
 
-export default function(){
+export default function () {
   const { data: session, status } = useSession();
-  const [editBio, setEditbio] = useState(false)
+  const [editBio, setEditbio] = useState(false);
   const [user, setUser] = useState<User>();
   const bioRef = useRef<HTMLTextAreaElement>(null);
 
-
-
-  useEffect(()=>{
-    const fetchUser = async()=>{
-     const res = await axios.get(`/api/user`)
-    console.log(res.data.user)
-     setUser(res.data.user);
-
-    }
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await axios.get(`/api/user`);
+      console.log(res.data.user);
+      setUser(res.data.user);
+    };
 
     fetchUser();
-  },[])
+  }, []);
 
   return (
     <>
@@ -60,7 +63,7 @@ export default function(){
           </div>
           {editBio ? (
             <InputGroup>
-              <InputGroupTextarea placeholder="Add to your bio"  ref={bioRef} />
+              <InputGroupTextarea placeholder="Add to your bio" ref={bioRef} />
               <InputGroupAddon align="block-end">
                 <InputGroupText className="text-muted-foreground text-xs">
                   Make it detailed so that AI can filter easily
@@ -107,9 +110,11 @@ export default function(){
         <CustomSpinner />
       )}
       <div className="max-w-7xl mx-auto mt-9">
+        <h1 className="text-3xl my-4 text-neutral-800 font-medium">
+          Your Repository
+        </h1>
         <RepoCard />
       </div>
     </>
   );
 }
-

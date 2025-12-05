@@ -96,9 +96,9 @@ export default function IssueDetail({
             if (res.status === 200) {
               console.log(res.data);
               const data = safeParseAI(res.data.issue.content);
-              console.log(data);
               setAIStats(data);
               toast("AI Response Fetched");
+              setAiLoader(false);
             } else if (res.status === 202) {
               const data = res.data.issue;
               setAIStats(data);
@@ -131,7 +131,7 @@ export default function IssueDetail({
           <Button
             variant="ghost"
             className="mb-6 hover-scale"
-            onClick={() => router.push(`/issues/${repo}`)}
+            onClick={() => router.push(`/issues/${issue.name}`)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Issues
