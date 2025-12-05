@@ -8,8 +8,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "user",
-          content:
-            "Best way to contribute to open source projects to get a job!",
+          content: "11:41 AM",
         },
       ],
     });
