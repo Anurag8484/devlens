@@ -20,7 +20,7 @@ import {
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Showdown from "showdown";
 import axios from "axios";
 import { Issue } from "@/app/issues/[name]/page";
@@ -54,6 +54,8 @@ export default function IssueDetail({
     metadata: true,
   });
   converter.setFlavor("github");
+
+  const fetchAIStats = useCallback(async () => {}, []);
 
   useEffect(() => {
     const fetchIssue = async () => {

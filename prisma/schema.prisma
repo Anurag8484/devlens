@@ -12,16 +12,17 @@ datasource db {
   provider = "postgresql"
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  name String
-  email String? @unique
-  emailVerified  DateTime?
-  bio String?
-  image          String?
-  repos           Repository[] @relation("UserRepos")
-  accounts       Account[]
-  sessions       Session[]
+model User {
+  id            Int          @id @default(autoincrement())
+  name          String
+  email         String?      @unique
+  emailVerified DateTime?
+  bio           String?
+  image         String?
+  repos         Repository[] @relation("UserRepos")
+  issues        UserIssue[]
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
@@ -30,12 +31,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -59,27 +60,54 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-
 model Repository {
-  id        Int       @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   githubUrl String
-  name String
+  name      String
   owner     String
   type      String?
   issues    Issue[]
-  user      User[]      @relation("UserRepos")
-  @@unique([name, owner], name: "name_owner")
+  user      User[]  @relation("UserRepos")
 
+  @@unique([name, owner], name: "name_owner")
 }
 
 model Issue {
-  id            Int      @id @default(autoincrement())
-  githubUrl     String
-  repo          Repository @relation(fields: [repoId], references: [id])
-  repoId        Int
-  label         String?
-  description   String?
-  approach      String?
-  recommended   String?
-  createdAt     DateTime @default(now())
+  id        Int    @id @default(autoincrement())
+  githubUrl String
+  githubId  Int? // GitHub issue number (#1234)
+
+  title  String
+  body   String?
+  labels Json?
+
+  repoId Int
+  repo   Repository @relation(fields: [repoId], references: [id])
+
+  aiSummary    String?
+  aiDifficulty String?
+  aiLabels     String[]
+  aiUpdatedAt  DateTime?
+
+  users UserIssue[]
+
+  createdAt DateTime @default(now())
+}
+
+model UserIssue {
+  id Int @id @default(autoincrement())
+
+  userId  Int
+  issueId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  issue Issue @relation(fields: [issueId], references: [id])
+
+  aiApproach       String?
+  aiRecommendation String?
+  notes            String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, issueId])
 }
