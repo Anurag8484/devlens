@@ -204,7 +204,7 @@ export default function IssueDetail({
             </CardContent>
           </Card>
 
-          <div className="shadow-lg p-7  hover:shadow-xl transition duration-200 border-neutral-200 border rounded-xl mt-5 ">
+          <div className="shadow-lg p-7 dark:text-white  hover:shadow-xl transition duration-200 border-neutral-200 border rounded-xl mt-5 ">
             {!ailoader && (
               <div>
                 <h1 className="text-2xl mb-2 inline-block text-transparent bg-clip-text  bg-linear-to-r from-black via-red-600 to-neutral-700 text-clip font-semibold  ">
@@ -218,25 +218,42 @@ export default function IssueDetail({
                   ))}
                 </p>
 
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                <div className="flex flex-col gap-2 ">
+                  <h3 className="text-xl mt-3  font-semibold text-neutral-700">
                     Description
                   </h3>
-                  <p className="text-sm text-black font-medium ">
+                  <p className="text-sm dark:text-neutral-100 text-black font-medium ">
                     {aiStats?.summary}
                   </p>
                   <h3 className="text-xl mt-3 font-semibold text-neutral-700">
                     Difficulty
                   </h3>
-                  <p className="text-sm text-black font-medium ">
+                  <Badge
+                    variant={"secondary"}
+                    className="text-sm dark:text-neutral-100  "
+                  >
                     {aiStats?.difficulty}
+                  </Badge>
+                  <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                    Cause
+                  </h3>
+                  <p className="text-sm dark:text-neutral-100 text-black font-medium ">
+                    {aiStats?.cause}
                   </p>
-                  {/* <h3 className="text-xl mt-3 font-semibold text-neutral-700">
-                Recommendations
-                </h3>
-                <p className="text-sm text-black font-medium ">
-                {aiStats?.recommended}
-                </p> */}
+                  <h3 className="text-xl mt-3 font-semibold text-neutral-700">
+                    Skills Required
+                  </h3>
+                  <div className="flex gap-2">
+                    {aiStats?.skills?.map((skill, index) => (
+                      <Badge
+                        key={index}
+                        className="font-semibold text-transparent bg-clip-text  bg-linear-to-r from-sky-600 via-yellow-600 to-sky-700 text-clip  "
+                        variant={"outline"}
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
 
                 <Badge

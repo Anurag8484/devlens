@@ -87,6 +87,8 @@ model Issue {
   summary    String?
   difficulty String?
   ailabels   String[]
+  skills     String[]
+  cause      String?
   updatedAt  DateTime?
 
   users UserIssue[]

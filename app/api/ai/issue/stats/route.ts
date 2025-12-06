@@ -10,10 +10,11 @@ export async function POST(req: NextRequest) {
   const prompt = `
         You are a concise assistant. Input is a GitHub issue. Produce JSON only with keys:
 
-        summary  -> max 40 words
+        summary  -> explain it in a very detailed way
         difficulty -> easy | medium | hard
         labels -> array of up to 4 simple labels (one or two words)
-        recommended -> your recommended approach in 2–4 sentences
+        casue -> what could be the cause of this according to you,
+        skills -> Skills needed to solve this issue -> array of skill, like [skill1, skill2] etc.
 
         Return JSON only. No prose.
 
@@ -80,8 +81,10 @@ export async function POST(req: NextRequest) {
         githubUrl: data.issue.html_url,
         title: data.issue.title,
         repoId: repo.id,
-        labels: finaldata.labels,
+        ailabels: finaldata.labels,
         githubId: data.issue.number,
+        skills: finaldata.skills,
+        cause: finaldata.cause ?? "",
         summary: finaldata.summary ?? "",
         difficulty: finaldata.difficulty ?? "",
       },

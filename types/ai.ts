@@ -3,4 +3,6 @@ export interface AIStatsIssue {
   difficulty?: string;
   labels?: string[];
   recommended?: string;
+  cause?: string;
+  skills?: string[];
 }
