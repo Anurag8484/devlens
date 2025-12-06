@@ -26,6 +26,7 @@ import axios from "axios";
 import Navbar from "@/app/components/Navbar";
 import { toast } from "sonner";
 import CustomSpinner from "@/app/components/CustomSpinner";
+import { issues } from "@/types/issues";
 
 export interface Issue {
   id: number;
@@ -45,9 +46,9 @@ export interface Issue {
 export interface UserIssues {
   id: number;
   approach?: string;
-  recommendations?: string;
+  recommendation?: string;
   notes?: string;
-  issue: Issue;
+  issue: issues;
 }
 
 interface Repo {
@@ -110,7 +111,7 @@ const IssuesTracker = () => {
     ...Array.from(
       new Set(
         userIssues.flatMap((userIssue) =>
-          userIssue.issue.labels.map((label) => normalize(label))
+          userIssue?.issue?.labels.map((label) => normalize(label))
         )
       )
     ),
@@ -130,11 +131,11 @@ const IssuesTracker = () => {
       );
 
     let matchesTime = true;
-    if (timeFilter === "6months") {
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12);
-      matchesTime = new Date(userIssue.issue.createdAt) >= sixMonthsAgo;
-    }
+    // if (timeFilter === "6months") {
+    //   const sixMonthsAgo = new Date();
+    //   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 12);
+    //   matchesTime = new Date(userIssue.issue.createdAt) >= sixMonthsAgo;
+    // }
 
     return matchesSearch && matchesRepo && matchesLabel && matchesTime;
   });
@@ -248,13 +249,9 @@ const IssuesTracker = () => {
                     <Card
                       key={issue.id}
                       className="p-6 hover:shadow-md transition-shadow border-border/50 cursor-pointer"
-                      //   onClick={() =>
-                      //     router.push(
-                      //       `/issues/detail/${userIssues.issue.owner}/${encodeURIComponent(
-                      //         issue.name
-                      //       )}/${issue.id}`
-                      //     )
-                      //   }
+                      onClick={() =>
+                        router.push(`/user/track/issues/${issue.id}`)
+                      }
                     >
                       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                         <div className="flex-1 space-y-3">
