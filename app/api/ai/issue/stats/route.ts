@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
     const response = completion.choices[0].message;
 
     const finaldata = safeParseAI(response.content ?? "");
+    const labels = data.issue.labels.map((l: any) => l.name);
 
     const newIssue = await prisma.issue.create({
       data: {
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
         title: data.issue.title,
         repoId: repo.id,
         ailabels: finaldata.labels,
-        labels: data.issue.labels,
+        labels,
         githubId: data.issue.number,
         skills: finaldata.skills,
         cause: finaldata.cause ?? "",

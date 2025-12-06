@@ -75,6 +75,10 @@ export default function Navbar() {
       title: "Dashboard",
       link: "/dashboard",
     },
+    {
+      title: "Issue Tracker",
+      link: "/user/track/issues",
+    },
   ];
 
   useEffect(() => {
