@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
         title: data.issue.title,
         repoId: repo.id,
         ailabels: finaldata.labels,
+        labels: data.issue.labels,
         githubId: data.issue.number,
         skills: finaldata.skills,
         cause: finaldata.cause ?? "",

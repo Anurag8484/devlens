@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
   AsteriskIcon,
+  Bookmark,
   Calendar,
   GitBranch,
   GithubIcon,
@@ -36,6 +37,11 @@ import { toast } from "sonner";
 import { AIStatsIssue } from "@/types/ai";
 import { safeParseAI } from "@/lib/utils/parseAIRes";
 import CustomSpinner from "@/app/components/CustomSpinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function IssueDetail({
   params,
@@ -46,6 +52,7 @@ export default function IssueDetail({
   const [issue, setIssue] = useState<Issue>();
   const [aiStats, setAIStats] = useState<AIStatsIssue>();
   const [ailoader, setAiLoader] = useState(true);
+  const [trackLoader, setTrackLoader] = useState(false);
   let repo = "";
 
   const converter = new Showdown.Converter({
@@ -128,14 +135,50 @@ export default function IssueDetail({
           transition={{ duration: 0.5 }}
           className="max-w-4xl mx-auto"
         >
-          <Button
-            variant="ghost"
-            className="mb-6 hover-scale"
-            onClick={() => router.push(`/issues/${issue.name}`)}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Issues
-          </Button>
+          <div className="flex justify-between items-center">
+            <Button
+              variant="ghost"
+              className="mb-6 hover-scale"
+              onClick={() => router.push(`/issues/${issue.name}`)}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Issues
+            </Button>
+            {trackLoader && <CustomSpinner />}
+            {!trackLoader && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    onClick={async () => {
+                      setTrackLoader(true);
+                      await axios
+                        .post(`/api/ai/issue/track?id=${issue.number}`, {
+                          issue,
+                        })
+                        .then((res) => {
+                          if (res.status === 200) {
+                            toast("Issue added track list!");
+                            setTrackLoader(false);
+                          } else if (res.status === 202) {
+                            toast("Issue already in Track List!");
+                            setTrackLoader(false);
+                          } else {
+                            toast("Error while tracking Issue!");
+                            setTrackLoader(false);
+                            return;
+                          }
+                        });
+                      return;
+                    }}
+                  >
+                    <Bookmark />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Track Issue</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
 
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
